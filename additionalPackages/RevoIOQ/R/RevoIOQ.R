@@ -9,7 +9,7 @@
 "RevoIOQ" <- function(printText=TRUE, printHTML=TRUE, 
    outdir=if (file.access(getwd(), mode=2)) file.path(tempdir(),"RevoIOQ") else file.path(getwd(),"RevoIOQ"), 
    basename=paste("Revo-IOQ-Report", format(Sys.time(), "%m-%d-%Y-%H-%M-%S"), sep="-"),
-   view=TRUE, clean=TRUE, runTestFileInOwnProcess=TRUE, testLocal=FALSE, testScaleR=TRUE)
+   view=TRUE, clean=TRUE, runTestFileInOwnProcess=TRUE, testLocal=FALSE)
 {    
     if (!require("RUnit", quietly=TRUE))
     {
@@ -42,16 +42,7 @@
     
     # define the Revo RUnit test suite and run tests
     testDirRoot <- system.file("unitTests", package="RevoIOQ")
-    testDirs <- unlist(lapply(file.path(testDirRoot,c("R","Revo")), function(x, os) file.path(x, c("common",os)), os=.Platform$OS.type))  
-    if (testScaleR) {	
-		if (!identical(system.file("DESCRIPTION", package="RevoScaleR") , "")) 
-		{
-			 # include the RevoScaleR tests if they exist
-			 raTestDirRoot <- system.file("unitTests", package="RevoScaleR")
-			 raTestDirs <-   file.path(raTestDirRoot, c("common", .Platform$OS.type))
-			 testDirs <- c(testDirs, raTestDirs)
-		}
-	}
+    testDirs <- unlist(lapply(file.path(testDirRoot,"R"), function(x, os) file.path(x, c("common",os)), os=.Platform$OS.type))  
     if (testLocal) 
     {
          # Create test files for local packages
@@ -69,12 +60,12 @@
 	 }
 	 testDirs <- c(testDirs, testPath)
     }
-    testSuiteName <- Revo.version$version.string
+    testSuiteName <- R.version$version.string
     if (is.null(testSuiteName)) {
 		testSuiteName <- tempfile()
 	}	
     testSuite <- defineTestSuite(name=testSuiteName, dirs=testDirs)
-    testResult <- runRevoTestSuite(testSuite, runTestFileInOwnProcess=runTestFileInOwnProcess)
+    testResult <- runTestSuite(testSuite)
     
     # create base filename 
     filename <- file.path(outdir, basename)
@@ -145,8 +136,8 @@
 "isComputeNode" <- function()
 {
     isComputeNode <- FALSE
-	if (.Platform$OS.type == "windows" && length(grep("Enterprise", Revo.version$version.string)) && 
-	       !file.exists(file.path(Revo.home(), "IDE32"))) {
+	if (.Platform$OS.type == "windows" && length(grep("Enterprise", R.version$version.string)) && 
+	       !file.exists(file.path(R.home(), "IDE32"))) {
 		isComputeNode <- TRUE
     }
     isComputeNode
