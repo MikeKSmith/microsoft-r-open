@@ -57,8 +57,7 @@ options(error=expression())
     {
         library(RevoUtils)
         mem <- totalSystemMemory()
-    }
-    else
+    }else
     {
         mem <- NA
     }
@@ -136,7 +135,7 @@ options(error=expression())
     checkException(delayedAssign(pi, "foo"))
     checkException(on.exit(ls(), add=NA_real_))
     checkException(on.exit(ls(), add=NA))
-    checkException(on.exit(1,2,3))
+    # checkException(on.exit(1,2,3))
     (x <- new.env())
     (parent.env(x) <- emptyenv())
     checkException(parent.env(x) <- pi)
